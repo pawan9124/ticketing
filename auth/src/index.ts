@@ -2,7 +2,7 @@ import mongoose, { mongo } from 'mongoose';
 import { app } from './app';
 
 const start = async () => {
-    console.log("Stating up...")
+    console.log("Stating up... in the index")
     //Here checking if the process.env variables are defined in the start of application as it will complain in the middle when app is running
     if(!process.env.JWT_KEY){
         throw new Error('JWT_KEY must be present in the enviornment');
