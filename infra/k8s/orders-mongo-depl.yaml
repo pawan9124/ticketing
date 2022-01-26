@@ -1,0 +1,33 @@
+# This is separate pod for the mongodb to be hosted for the orders service 
+# Microservices rule per service there should be database
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-mongo-depl
+spec:
+  replicas: 1 # this is how many pods we want to create 
+  selector:
+    matchLabels: # match label is used for deployment to poin the mongodb POD
+      app: orders-mongo
+  template:
+    metadata:
+      labels:
+        app: orders-mongo
+    spec:
+      containers:
+        - name: orders-mongo
+          image: mongo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders-mongo-srv
+spec:
+  selector:
+    app: orders-mongo
+  ports:
+    - name: orders-db
+      protocol: TCP
+      port: 27017
+      targetPort: 27017

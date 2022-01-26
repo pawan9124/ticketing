@@ -1,0 +1,45 @@
+#First to get the object from the pool of the objects of the kubernetes
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-depl # name of the deployment
+spec:
+  replicas: 1 # how many containers need to create inside a pod
+  selector:
+    matchLabels: #match labels find the container by name provided here
+      app: auth
+  template:  # this is the container template 
+    metadata:
+      labels: #label indicates the name to be match by the deployment
+        app: auth
+    spec:
+      containers:
+        - name: auth #name of the container
+          image: pawan9124/auth #latest branch will automatically came
+          env: # used to set the environment variable available inside the POD
+          - name: MONGO_URI
+            value: 'mongodb://auth-mongo-srv:27017/auth'
+          - name: JWT_KEY #array of name here only one is JWT_KEY present inside the container
+            valueFrom: #get the value from the secrete we created in the kubernetes through terminal
+              secretKeyRef:
+                name: jwt-secret # this the name of the secret we created 
+                key: JWT_KEY # this is the key we assigned when creating the secret from command `kubectl create secret generic genric-secret --from-literal=JWT_KEY=asdf`
+
+# also service included in the same file 
+#Services are used to connect to the POD and container through port
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-srv
+spec:
+  type: ClusterIP # cluster IP is used to communicate inter pods - can be ignore to write default included ClusterIP
+  selector: # selector is to select the pod 
+    app: auth
+  ports:
+    - name: auth # select the container
+      protocol: TCP
+      port: 3000 #port exposed on the POD
+      targetPort: 3000 # target port is the port where the app is listening

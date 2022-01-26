@@ -1,0 +1,49 @@
+#ingress services act as a router to route the request to the different pods based on the URL
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-service
+  annotations:
+    kubernetes.io/ingress.class: nginx # we use the nginx services
+    nginx.ingress.kubernetes.io/use-regex: 'true' # this true specify we are going to use regex in the routes
+spec:
+  rules:
+    - host: ticketing.dev
+      http:
+        paths:
+          - path: /api/payments/?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: payments-srv
+                port:
+                  number: 3000 #Auth-srv are opening port 3000 on pod and service is also running in port 3000
+          - path: /api/users/?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-srv
+                port:
+                  number: 3000 #Auth-srv are opening port 3000 on pod and service is also running in port 3000
+          - path: /api/tickets/?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: tickets-srv
+                port:
+                  number: 3000 #Tickets-srv are opening port 3000 on pod and service is also running in port 3000
+          - path: /api/orders/?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: orders-srv
+                port:
+                  number: 3000 #Orders-srv are opening port 3000 on pod and service is also running in port 3000
+          - path: /?(.*) # catchall route generally the client application
+            pathType: Prefix
+            backend:
+              service:
+                name: client-srv
+                port:
+                  number: 3000 #client-srv are opening port 3000 on pod and service is also running in port 3000
+        

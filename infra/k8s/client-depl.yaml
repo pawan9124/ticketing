@@ -1,0 +1,32 @@
+apiVersion: apps/v1 # getting the objects apps from the pool of objects
+kind: Deployment # Deployment used to restart and mange the PODS
+metadata: 
+  name: client-depl # name of the deployment
+spec: #where we define the behaviour of the deployment
+  replicas: 1 #How many no of pods want to manage
+  selector: #deployment used to find the pods
+    matchLabels:
+      app: client
+  template: #name of the pods
+    metadata:
+      labels:
+        app: client
+    spec:
+      containers:
+        - name: client
+          image: pawan9124/client
+
+---
+#Creating the service to communicate with the pods
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-srv
+spec:
+  selector: #choose the pods which this service would target to communicate
+    app: client
+  ports:
+    - name: client # the name of the container used for loggin purpose
+      protocol: TCP
+      port: 3000 #Port open inside the pods
+      targetPort: 3000 #POrt on which application run inside the contianer

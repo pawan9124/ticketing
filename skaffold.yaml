@@ -1,0 +1,62 @@
+#For reference check the blog microservices used
+#Skaffold used in the local development
+apiVersion: skaffold/v2beta26 #version of objects of pool
+kind: Config
+deploy:
+  kubectl:
+    manifests:
+      - ./infra/k8s/*
+build: 
+  local: #whether to push to the docker hub is false in development
+    push: false
+  artifacts:
+    - image: pawan9124/auth # image in the docker hub
+      context: auth # it the folder which it will keep watching here it is auth 
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: '/src/**/*.ts'
+            dest: . #directly put the changed file inside the container
+    - image: pawan9124/client # image in the docker hub
+      context: client # it the folder which it will keep watching here it is auth 
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: '**/*.js'
+            dest: . #directly put the changed file inside the container
+    - image: pawan9124/tickets # image in the docker hub
+      context: tickets # it the folder which it will keep watching here it is auth 
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: '/src/**/*.ts'
+            dest: . #directly put the changed file inside the container
+    - image: pawan9124/orders # image in the docker hub
+      context: orders # it the folder which it will keep watching here it is auth 
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: '/src/**/*.ts'
+            dest: . #directly put the changed file inside the container
+    - image: pawan9124/expiration # image in the docker hub
+      context: expiration # it the folder which it will keep watching here it is auth 
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: '/src/**/*.ts'
+            dest: . #directly put the changed file inside the container
+    - image: pawan9124/payments # image in the docker hub
+      context: payments # it the folder which it will keep watching here it is auth 
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: '/src/**/*.ts'
+            dest: . #directly put the changed file inside the container
+    
+            

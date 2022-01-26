@@ -1,0 +1,33 @@
+# This is separate pod for the mongodb to be hosted for the payments service 
+# Microservices rule per service there should be database
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-mongo-depl
+spec:
+  replicas: 1 # this is how many pods we want to create 
+  selector:
+    matchLabels: # match label is used for deployment to poin the mongodb POD
+      app: payments-mongo
+  template:
+    metadata:
+      labels:
+        app: payments-mongo
+    spec:
+      containers:
+        - name: payments-mongo
+          image: mongo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payments-mongo-srv
+spec:
+  selector:
+    app: payments-mongo
+  ports:
+    - name: payments-db
+      protocol: TCP
+      port: 27017
+      targetPort: 27017

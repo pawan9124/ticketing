@@ -1,0 +1,31 @@
+#First to get the object from the pool of the objects of the kubernetes
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expiration-depl # name of the deployment
+spec:
+  replicas: 1 # how many containers need to create inside a pod
+  selector:
+    matchLabels: #match labels find the container by name provided here
+      app: expiration
+  template:  # this is the container template 
+    metadata:
+      labels: #label indicates the name to be match by the deployment
+        app: expiration
+    spec:
+      containers:
+        - name: expiration #name of the container
+          image: pawan9124/expiration #latest branch will automatically came
+          env: # used to set the environment variable available inside the POD
+            - name: NATS_CLIENT_ID #nats client ID will help to uniquely identify the client ID in nats by making it same as the pods name
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NATS_URL
+              value: 'http://nats-srv:4222'
+            - name: NATS_CLUSTER_ID
+              value: ticketing
+            - name: REDIS_HOST
+              value: expiration-redis-srv
+
+# We don't need service for the expiration cause we not gonna connect it directly from anywhere

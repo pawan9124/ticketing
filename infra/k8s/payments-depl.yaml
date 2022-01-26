@@ -1,0 +1,58 @@
+#First to get the object from the pool of the objects of the kubernetes
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-depl # name of the deployment
+spec:
+  replicas: 1 # how many containers need to create inside a pod
+  selector:
+    matchLabels: #match labels find the container by name provided here
+      app: payments
+  template:  # this is the container template 
+    metadata:
+      labels: #label indicates the name to be match by the deployment
+        app: payments
+    spec:
+      containers:
+        - name: payments #name of the container
+          image: pawan9124/payments #latest branch will automatically came
+          env: # used to set the environment variable available inside the POD
+            - name: NATS_CLIENT_ID #nats client ID will help to uniquely identify the client ID in nats by making it same as the pods name
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NATS_URL
+              value: 'http://nats-srv:4222'
+            - name: NATS_CLUSTER_ID
+              value: ticketing
+            - name: MONGO_URI #getting the mongo uri form the env variable
+              value: 'mongodb://payments-mongo-srv:27017/payments'
+            - name: JWT_KEY #array of name here only one is JWT_KEY present inside the container
+              valueFrom: #get the value from the secrete we created in the kubernetes through terminal
+                secretKeyRef:
+                  name: jwt-secret # this the name of the secret we created 
+                  key: JWT_KEY # this is the key we assigned when creating the secret from command `kubectl create secret generic genric-secret --from-literal=JWT_KEY=asdf`
+            - name: STRIPE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: stripe-secret
+                  key: STRIPE_KEY
+
+# also service included in the same file 
+#Services are used to connect to the POD and container through port
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: payments-srv
+spec:
+  type: ClusterIP # cluster IP is used to communicate inter pods - can be ignore to write default included ClusterIP
+  selector: # selector is to select the pod 
+    app: payments
+  ports:
+    - name: payments # select the container
+      protocol: TCP
+      port: 3000 #port exposed on the POD
+      targetPort: 3000 # target port is the port where the app is listening
