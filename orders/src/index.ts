@@ -7,6 +7,7 @@ import { TicketUpdatedListener } from './events/listeners/ticket-updated-listene
 import { natsWrapper } from './nats-wrapper';
 
 const start = async () => {
+    console.log("Starting the server")
     //Here checking if the process.env variables are defined in the start of application as it will complain in the middle when app is running
     if(!process.env.JWT_KEY){
         throw new Error('JWT_KEY must be present in the enviornment');
